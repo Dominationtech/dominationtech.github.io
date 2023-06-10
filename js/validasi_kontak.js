@@ -1,56 +1,70 @@
-window.onload = function () {
+window.onload = function() {
   var form = document.forms["submit-pesan"];
+  var emailInput = form.elements["email"];
+  var namaInput = form.elements["nama"];
+  var pesanInput = form.elements["pesan"];
+  var alertBox = document.querySelector(".my-alert");
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", function(event) {
     event.preventDefault(); // Menghentikan pengiriman formulir secara default
 
-    var emailInput = form.elements["email"];
-    var namaInput = form.elements["nama"];
-    var pesanInput = form.elements["pesan"];
-
-    // Validasi Email
-    if (!validateEmail(emailInput.value)) {
-      showAlert("Email harus diisi");
-      return;
+    if (validateForm()) {
+      showAlert("Terima Kasih! Kami Telah Menerima Pesan Anda.", "alert-success");
+      resetForm();
     }
-
-    // Validasi Nama Lengkap
-    if (namaInput.value.trim() === "") {
-      showAlert("Nama Lengkap harus diisi");
-      return;
-    }
-
-    // Validasi Pesan
-    if (pesanInput.value.trim() === "") {
-      showAlert("Pesan harus diisi");
-      return;
-    }
-
-    // Menampilkan pesan sukses setelah validasi berhasil
-    var alertBox = document.querySelector(".my-alert");
-    alertBox.classList.remove("d-none");
-    alertBox.classList.remove("alert-danger");
-    alertBox.classList.add("alert-success");
-    alertBox.innerHTML = '<strong>Terima Kasih!</strong> Kami Telah Menerima Pesan Anda.';
-
-    // Mengosongkan input setelah pengiriman berhasil
-    emailInput.value = "";
-    namaInput.value = "";
-    pesanInput.value = "";
-    // Reload halaman saat pertama kali dimuat
-  location.reload();
   });
+
+  function validateForm() {
+    if (!validateEmail(emailInput.value)) {
+      showAlert("Email harus diisi", "alert-danger");
+      return false;
+    }
+
+    if (namaInput.value.trim() === "") {
+      showAlert("Nama Lengkap harus diisi", "alert-danger");
+      return false;
+    }
+
+    if (pesanInput.value.trim() === "") {
+      showAlert("Pesan harus diisi", "alert-danger");
+      return false;
+    }
+
+    return true;
+  }
 
   function validateEmail(email) {
     var re = /\S+@\S+\.\S+/;
     return re.test(email);
   }
 
-  function showAlert(message) {
-    var alertBox = document.querySelector(".my-alert");
-    alertBox.classList.add("show");
-    alertBox.classList.remove("alert-success");
-    alertBox.classList.add("alert-danger");
-    alertBox.innerHTML = '<strong>Error!</strong> ' + message;
+  function showAlert(message, alertClass) {
+    alertBox.textContent = message;
+    alertBox.classList.remove("d-none");
+    alertBox.classList.toggle("alert-danger", alertClass === "alert-danger");
+    alertBox.classList.toggle("alert-success", alertClass === "alert-success");
+  }
+
+  function resetForm() {
+    form.reset();
+  }
+
+  // Cek status refresh menggunakan localStorage
+  var isRefreshed = localStorage.getItem("isRefreshed");
+
+  if (!isRefreshed) {
+    // Mengosongkan input setelah pengiriman berhasil
+    emailInput.value = "";
+    namaInput.value = "";
+    pesanInput.value = "";
+
+    // Set status refresh menjadi true di localStorage
+    localStorage.setItem("isRefreshed", true);
+
+    // Reload halaman saat pertama kali dimuat
+    location.reload();
+  } else {
+    // Hapus status refresh dari localStorage
+    localStorage.removeItem("isRefreshed");
   }
 };
