@@ -37,6 +37,8 @@ window.onload = function () {
     emailInput.value = "";
     namaInput.value = "";
     pesanInput.value = "";
+    // Reload halaman saat pertama kali dimuat
+  location.reload();
   });
 
   function validateEmail(email) {
